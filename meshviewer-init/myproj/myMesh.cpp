@@ -11,7 +11,6 @@ using namespace std;
 
 myMesh::myMesh(void)
 {
-	// Les vectors sont vides par défaut, c'est ok
 }
 
 
@@ -70,6 +69,13 @@ bool myMesh::readFile(std::string filename)
 		{
 			float x, y, z;
 			myline >> x >> y >> z;
+
+			myVertex *v = new myVertex();
+			v->point = new myPoint3D(x, y, z);
+			v->index = vertices.size();
+			v->originof = NULL;
+			vertices.push_back(v);
+
 			cout << "v " << x << " " << y << " " << z << endl;
 		}
 		else if (t == "mtllib") {}
