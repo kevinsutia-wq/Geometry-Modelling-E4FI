@@ -83,9 +83,37 @@ bool myMesh::readFile(std::string filename)
 		else if (t == "s") {}
 		else if (t == "f")
 		{
-			cout << "f"; 
-			while (myline >> u) cout << " " << atoi((u.substr(0, u.find("/"))).c_str());
+			faceids.clear();
+			cout << "f";
+			while (myline >> u)
+			{
+				int vertex_index = atoi((u.substr(0, u.find("/"))).c_str()) - 1;
+				faceids.push_back(vertex_index);
+				cout << " " << vertex_index;
+			}
 			cout << endl;
+
+			// Créer une nouvelle face
+			myFace *face = new myFace();
+			face->index = faces.size();
+			faces.push_back(face);
+
+			// Créer un half-edge pour chaque arête de la face
+			hedges = new myHalfedge*[faceids.size()];
+
+			for (unsigned int i = 0; i < faceids.size(); i++)
+			{
+				hedges[i] = new myHalfedge();
+				hedges[i]->index = halfedges.size();
+				hedges[i]->source = vertices[faceids[i]];
+				hedges[i]->adjacent_face = face;
+
+				halfedges.push_back(hedges[i]);
+			}
+
+			face->adjacent_halfedge = hedges[0];
+
+			cout << "Face " << face->index << " created with " << faceids.size() << " half-edges" << endl;
 		}
 	}
 
