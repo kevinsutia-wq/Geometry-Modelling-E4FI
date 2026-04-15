@@ -135,6 +135,9 @@ bool myMesh::readFile(std::string filename)
 				}
 
 				// set originof
+				if (vertices[curr_vertex]->originof == NULL)
+					vertices[curr_vertex]->originof = hedges[i];
+
 				// push edges to halfedges in myMesh
 			}
 
