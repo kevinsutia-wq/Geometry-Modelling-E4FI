@@ -93,27 +93,53 @@ bool myMesh::readFile(std::string filename)
 			}
 			cout << endl;
 
-			// Créer une nouvelle face
-			myFace *face = new myFace();
-			face->index = faces.size();
-			faces.push_back(face);
+			// Ignorer les faces dégénérées (moins de 3 sommets)
+			if (faceids.size() < 3)
+				continue;
 
-			// Créer un half-edge pour chaque arête de la face
-			hedges = new myHalfedge*[faceids.size()];
+			// Pré-allouer les half-edges
+			hedges = new myHalfedge *[faceids.size()];
+			for (unsigned int i = 0; i < faceids.size(); i++)
+				hedges[i] = new myHalfedge();
 
+			// Créer la face
+			myFace *f = new myFace();
+			f->adjacent_halfedge = hedges[0];
+
+			// Traiter chaque half-edge
 			for (unsigned int i = 0; i < faceids.size(); i++)
 			{
-				hedges[i] = new myHalfedge();
-				hedges[i]->index = halfedges.size();
-				hedges[i]->source = vertices[faceids[i]];
-				hedges[i]->adjacent_face = face;
+				int iplusone = (i + 1) % faceids.size();
+				int iminusone = (i - 1 + faceids.size()) % faceids.size();
 
-				halfedges.push_back(hedges[i]);
+				// connect prevs, and next
+				hedges[i]->next = hedges[iplusone];
+				hedges[i]->prev = hedges[iminusone];
+
+				// search for the twins using twin_map
+				int curr_vertex = faceids[i];
+				int next_vertex = faceids[iplusone];
+
+				pair<int, int> edge_pair = make_pair(curr_vertex, next_vertex);
+				pair<int, int> reverse_pair = make_pair(next_vertex, curr_vertex);
+
+				if (twin_map.find(reverse_pair) != twin_map.end())
+				{
+					hedges[i]->twin = twin_map[reverse_pair];
+					twin_map[reverse_pair]->twin = hedges[i];
+					twin_map.erase(reverse_pair);
+				}
+				else
+				{
+					twin_map[edge_pair] = hedges[i];
+				}
+
+				// set originof
+				// push edges to halfedges in myMesh
 			}
 
-			face->adjacent_halfedge = hedges[0];
-
-			cout << "Face " << face->index << " created with " << faceids.size() << " half-edges" << endl;
+			delete[] hedges;
+			// push faces to faces in myMesh
 		}
 	}
 
