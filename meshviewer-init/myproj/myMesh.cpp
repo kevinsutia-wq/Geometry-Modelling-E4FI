@@ -138,8 +138,19 @@ bool myMesh::readFile(std::string filename)
 				if (vertices[curr_vertex]->originof == NULL)
 					vertices[curr_vertex]->originof = hedges[i];
 
-				// push edges to halfedges in myMesh
+				//Assignation source et adjacent_face
+				hedges[i]->source = vertices[faceids[i]];
+				hedges[i]->adjacent_face = f;
+
+				//Enregistre l'arrête dans le maillage
+				hedges[i]->index = halfedges.size();
+				halfedges.push_back(hedges[i]);
+
 			}
+
+			// Ajout de la face à la liste globale
+			f->index = faces.size();
+			faces.push_back(f);
 
 			delete[] hedges;
 			// push faces to faces in myMesh
