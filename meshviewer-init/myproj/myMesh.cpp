@@ -138,17 +138,14 @@ bool myMesh::readFile(std::string filename)
 				if (vertices[curr_vertex]->originof == NULL)
 					vertices[curr_vertex]->originof = hedges[i];
 
-				//Assignation source et adjacent_face
 				hedges[i]->source = vertices[faceids[i]];
 				hedges[i]->adjacent_face = f;
 
-				//Enregistre l'arrête dans le maillage
 				hedges[i]->index = halfedges.size();
 				halfedges.push_back(hedges[i]);
 
 			}
 
-			// Ajout de la face à la liste globale
 			f->index = faces.size();
 			faces.push_back(f);
 
@@ -166,7 +163,15 @@ bool myMesh::readFile(std::string filename)
 
 void myMesh::computeNormals()
 {
-	/**** TODO ****/
+	// Calcule la normale de chaque face
+	for (unsigned int i = 0; i < faces.size(); i++) {
+		faces[i]->computeNormal();
+	}
+
+	// Pareil pour sommet
+	for (unsigned int i = 0; i < vertices.size(); i++) {
+		vertices[i]->computeNormal();
+	}
 }
 
 void myMesh::normalize()

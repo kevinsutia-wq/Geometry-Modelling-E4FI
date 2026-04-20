@@ -15,7 +15,16 @@ myVertex::~myVertex(void)
 	if (normal) delete normal;
 }
 
-void myVertex::computeNormal()
-{
-	/**** TODO ****/
+void myVertex::computeNormal() {
+	myHalfedge* h = originof;
+	normal->dX = 0.0;
+	normal->dY = 0.0;
+	normal->dZ = 0.0;
+	do {
+		normal->dX += h->adjacent_face->normal->dX;
+		normal->dY += h->adjacent_face->normal->dY;
+		normal->dZ += h->adjacent_face->normal->dZ;
+		h = h->twin->next;
+	} while (h != originof);
+	normal->normalize();
 }
