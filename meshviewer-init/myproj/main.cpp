@@ -251,19 +251,40 @@ void display()
 		glUniform4fv(glGetUniformLocation(shaderprogram, "kd"), 1, &color[0]);
 
 		vector <GLuint> silhouette_edges;
-		for (vector<myHalfedge *>::iterator it = m->halfedges.begin(); it != m->halfedges.end(); it++)
+		for (vector<myHalfedge*>::iterator it = m->halfedges.begin(); it != m->halfedges.end(); it++)
 		{
-			/**** TODO: WRITE CODE TO COMPUTE SILHOUETTE ****/
-			myHalfedge *e = (*it);
-			myVertex *v1 = (*it)->source;
-			if ((*it)->twin == NULL) continue;
-			myVertex *v2 = (*it)->twin->source;
+			myHalfedge* e = (*it);
+			myFace* f1 = e->adjacent_face;
+			myFace* f2 = (e->twin) ? e->twin->adjacent_face : NULL;
 
-			if ( 0 /*ADD THE CONDITION TO CHECK IF THE HALFEDGE DEFINED BY (V1, V2) IS A SILHOUETTE EDGE*/ )
-			{
-				silhouette_edges.push_back(v1->index);
-				silhouette_edges.push_back(v2->index);
-			}				
+			// calcul de visibiilite de la premiere face
+			// la normale fois la face par la direction de la cam
+			float dot1 = f1->normal->dX * camera_forward.dX +
+				f1->normal->dY * camera_forward.dY +
+				f1->normal->dZ * camera_forward.dZ;
+
+			bool isSilhouette = false;
+
+			if (!f2) {
+				// pas de face jumelle alors cest un bord du maillage
+				isSilhouette = true;
+			}
+			else {
+				// calcul de visibilité de la face 2
+				float dot2 = f2->normal->dX * camera_forward.dX +
+					f2->normal->dY * camera_forward.dY +
+					f2->normal->dZ * camera_forward.dZ;
+
+				// signes sont diff alors c'est une arrete de silhouette
+				if ((dot1 > 0) != (dot2 > 0)) {
+					isSilhouette = true;
+				}
+			}
+
+			if (isSilhouette) {
+				silhouette_edges.push_back(e->source->index);
+				silhouette_edges.push_back(e->next->source->index);
+			}
 		}
 
 		GLuint silhouette_edges_buffer;
