@@ -275,6 +275,7 @@ void display()
 					f2->normal->dY * camera_forward.dY +
 					f2->normal->dZ * camera_forward.dZ;
 
+
 				// signes sont diff alors c'est une arrete de silhouette
 				if ((dot1 > 0) != (dot2 > 0)) {
 					isSilhouette = true;

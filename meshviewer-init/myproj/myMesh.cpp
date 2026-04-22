@@ -235,13 +235,63 @@ void myMesh::subdivisionCatmullClark()
 
 void myMesh::triangulate()
 {
-	/**** TODO ****/
+	// copier la liste des faces
+	vector<myFace*> listeFaces = faces;
+
+
+	for (unsigned int i = 0; i < listeFaces.size(); i++){
+		this->triangulate(listeFaces[i]);
+	}
+
+	this->computeNormals();
 }
 
 //return false if already triangle, true othewise.
-bool myMesh::triangulate(myFace *f)
+bool myMesh::triangulate(myFace* f)
 {
-	/**** TODO ****/
-	return false;
+	int nombrePoints = 0;
+
+	myHalfedge* courant = f->adjacent_halfedge;
+
+	// tourner autour de face
+	do{
+		nombrePoints = nombrePoints + 1;
+		courant = courant->next;
+	} while (courant != f->adjacent_halfedge);
+
+	if (nombrePoints <= 3){
+		return false;
+	}
+
+
+	// faire la moyenne des points 
+	float sommeX = 0;
+	float sommeY = 0;
+	float sommeZ = 0;
+	courant = f->adjacent_halfedge;
+
+	do{
+		sommeX = sommeX + courant->source->point->X;
+		sommeY = sommeY + courant->source->point->Y;
+		sommeZ = sommeZ + courant->source->point->Z;
+		courant = courant->next;
+	} 
+	
+	
+	while (courant != f->adjacent_halfedge);
+
+
+	// point au centre
+	float centreX = sommeX / nombrePoints;
+	float centreY = sommeY / nombrePoints;
+	float centreZ = sommeZ / nombrePoints;
+
+	myPoint3D* centre = new myPoint3D(centreX, centreY, centreZ);
+
+
+	// Diviser la face en triangles
+	this->splitFaceTRIS(f, centre);
+
+	return true;
 }
 
