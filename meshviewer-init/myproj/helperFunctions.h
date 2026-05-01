@@ -20,13 +20,13 @@ GLuint  shaderprogram;
 int Glut_w = 600, Glut_h = 400;
 
 //Variables and their values for the camera setup.
-myPoint3D camera_eye(0, 0, 2);
+myPoint3D camera_eye(0, 0, 5);
 myVector3D camera_up(0, 1, 0);
 myVector3D camera_forward(0, 0, -1);
 
 float fovy = 45.0f;
-float zNear = 0.1f;
-float zFar = 6000;
+float zNear = 0.01f;
+float zFar = 10000;
 
 int frame = 0, timebase = 0;
 float fps = 0;
@@ -655,7 +655,8 @@ GLuint initshaders(GLenum type, const char *filename)
 	string str = textFileRead(filename);
 	GLchar * cstr = new GLchar[str.size() + 1];
 	const GLchar * cstr2 = cstr; // Weirdness to get a const char
-	strcpy_s(cstr, str.size() + 1, str.c_str());
+	strncpy(cstr, str.c_str(), str.size());
+	cstr[str.size()] = '\0';
 	glShaderSource(shader, 1, &cstr2, NULL);
 	glCompileShader(shader);
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);

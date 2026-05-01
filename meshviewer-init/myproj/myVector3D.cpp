@@ -1,5 +1,5 @@
-#include "myvector3d.h"
-#include "mypoint3d.h"
+#include "myVector3D.h"
+#include "myPoint3D.h"
 #include <iostream>
  
 myVector3D::myVector3D() {}
@@ -11,12 +11,12 @@ myVector3D::myVector3D(double dx, double dy, double dz)
     dZ = dz;
 }
 
-double myVector3D::operator*(myVector3D & v1)
+double myVector3D::operator*(const myVector3D & v1) const
 {
     return (v1.dX*dX + v1.dY*dY + v1.dZ*dZ);
 }
 
-myVector3D myVector3D::operator+(myVector3D & v1)
+myVector3D myVector3D::operator+(const myVector3D & v1) const
 {
 	return myVector3D(dX+v1.dX, dY+v1.dY, dZ+v1.dZ);
 }
@@ -29,34 +29,34 @@ myVector3D myVector3D::operator+=(const myVector3D & v)
 	return *this;
 }
 
-myVector3D myVector3D::operator-()
+myVector3D myVector3D::operator-() const
 {
 	return myVector3D(-dX, -dY, -dZ);
 }
 
-myVector3D myVector3D::operator-(myVector3D & v1)
+myVector3D myVector3D::operator-(const myVector3D & v1) const
 {
 	return myVector3D(dX-v1.dX, dY-v1.dY, dZ-v1.dZ);
 }
 
-myVector3D myVector3D::operator*(double s)
+myVector3D myVector3D::operator*(double s) const
 {
 	return myVector3D(dX*s, dY*s, dZ*s);
 }
 
-myVector3D myVector3D::operator/(double s)
+myVector3D myVector3D::operator/(double s) const
 {
 	return myVector3D(dX/s, dY/s, dZ/s);
 }
 
-void myVector3D::crossproduct(myVector3D & v1, myVector3D & v2)
+void myVector3D::crossproduct(const myVector3D & v1, const myVector3D & v2)
 {
 	dX = v1.dY * v2.dZ - v1.dZ * v2.dY;
 	dY = v1.dZ * v2.dX - v1.dX * v2.dZ;
 	dZ = v1.dX * v2.dY - v1.dY * v2.dX;
 }
 
-myVector3D myVector3D::crossproduct(myVector3D & v1)
+myVector3D myVector3D::crossproduct(const myVector3D & v1) const
 {
 	myVector3D result;
 	result.crossproduct(*this, v1);
@@ -72,7 +72,7 @@ void myVector3D::setNormal(myPoint3D *p1, myPoint3D *p2, myPoint3D *p3)
 	normalize();
 }
 
-double myVector3D::length( )
+double myVector3D::length( ) const
 {
     return sqrt( dX*dX + dY*dY + dZ*dZ ); 
 }
@@ -90,7 +90,7 @@ void myVector3D::clear()
 	dX = dY = dZ = 0.0;
 }
 
-void myVector3D::rotate(myVector3D & lp, double theta)
+void myVector3D::rotate(const myVector3D & lp, double theta)
 {
 	//rotate vector *this around the line defined by lp through the origin by theta degrees.
 	const double cos_theta = cos(theta);

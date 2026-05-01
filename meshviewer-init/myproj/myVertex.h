@@ -1,5 +1,5 @@
 #pragma once
-#include "mypoint3d.h"
+#include "myPoint3D.h"
 
 class myHalfedge;
 class myVector3D;

@@ -1,5 +1,5 @@
-#include "mypoint3d.h"
-#include "myvector3d.h"
+#include "myPoint3D.h"
+#include "myVector3D.h"
 #include <iostream>
 
 myPoint3D::myPoint3D()
@@ -14,16 +14,16 @@ myPoint3D::myPoint3D(double x, double y, double z)
 	Z = z;
 }
 
-myPoint3D myPoint3D::operator+(myVector3D & v1)
+myPoint3D myPoint3D::operator+(const myVector3D & v1) const
 {
 	return myPoint3D(X + v1.dX, Y + v1.dY, Z + v1.dZ);
 }
 
-myPoint3D myPoint3D::operator+(myPoint3D & v1)
+myPoint3D myPoint3D::operator+(const myPoint3D & v1) const
 {
 	return myPoint3D(X + v1.X, Y + v1.Y, Z + v1.Z);
 }
-myPoint3D & myPoint3D::operator+=(myVector3D & v1)
+myPoint3D & myPoint3D::operator+=(const myVector3D & v1)
 {
 	X += v1.dX;
 	Y += v1.dY;
@@ -31,7 +31,7 @@ myPoint3D & myPoint3D::operator+=(myVector3D & v1)
 	return *this;
 }
 
-myPoint3D & myPoint3D::operator+=(myPoint3D & v1)
+myPoint3D & myPoint3D::operator+=(const myPoint3D & v1)
 {
 	X += v1.X;
 	Y += v1.Y;
@@ -58,17 +58,17 @@ myPoint3D & myPoint3D::operator*=(double d)
 	return *this;
 }
 
-myPoint3D myPoint3D::operator/(double d)
+myPoint3D myPoint3D::operator/(double d) const
 {
 	return myPoint3D(X / d, Y / d, Z / d);
 }
 
-myPoint3D myPoint3D::operator*(double d)
+myPoint3D myPoint3D::operator*(double d) const
 {
 	return myPoint3D(X * d, Y * d, Z * d);
 }
 
-myVector3D myPoint3D::operator-(myPoint3D & p1)
+myVector3D myPoint3D::operator-(const myPoint3D & p1) const
 {
 	return myVector3D(X - p1.X, Y - p1.Y, Z - p1.Z);
 }
@@ -78,7 +78,7 @@ double myPoint3D::dist(myPoint3D p1)
 	return sqrt((p1.X - X)*(p1.X - X) + (p1.Y - Y)*(p1.Y - Y) + (p1.Z - Z)*(p1.Z - Z));
 }
 
-void myPoint3D::rotate(myVector3D & lp, double theta)
+void myPoint3D::rotate(const myVector3D & lp, double theta)
 {
 	myVector3D tmp(X, Y, Z);
 	tmp.rotate(lp, theta);

@@ -5,7 +5,7 @@
 #include <map>
 #include <utility>
 #include <GL/glew.h>
-#include "myvector3d.h"
+#include "myVector3D.h"
 
 using namespace std;
 
@@ -93,16 +93,16 @@ bool myMesh::readFile(std::string filename)
 			}
 			cout << endl;
 
-			// Ignorer les faces dégénérées (moins de 3 sommets)
+			// Ignorer les faces dï¿½gï¿½nï¿½rï¿½es (moins de 3 sommets)
 			if (faceids.size() < 3)
 				continue;
 
-			// Pré-allouer les half-edges
+			// Prï¿½-allouer les half-edges
 			hedges = new myHalfedge *[faceids.size()];
 			for (unsigned int i = 0; i < faceids.size(); i++)
 				hedges[i] = new myHalfedge();
 
-			// Créer la face
+			// Crï¿½er la face
 			myFace *f = new myFace();
 			f->adjacent_halfedge = hedges[0];
 

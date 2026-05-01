@@ -1,5 +1,5 @@
 #include "myVertex.h"
-#include "myvector3d.h"
+#include "myVector3D.h"
 #include "myHalfedge.h"
 #include "myFace.h"
 

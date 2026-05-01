@@ -12,8 +12,8 @@
 
 using namespace std;
 
-#include "mypoint3d.h"
-#include "myvector3d.h"
+#include "myPoint3D.h"
+#include "myVector3D.h"
 #include "myMesh.h"
 
 enum MENU { MENU_CATMULLCLARK, MENU_DRAWWIREFRAME, MENU_EXIT, MENU_DRAWMESH, MENU_LOOP, MENU_DRAWMESHVERTICES,
@@ -393,7 +393,8 @@ void initMesh()
 	closest_face = NULL;
 
 	m = new myMesh();
-	if (m->readFile("dolphin.obj")) {
+	// Choisis le modèle : hand.obj, apple.obj ou cube.obj
+	if (m->readFile("apple.obj")) {
 		m->computeNormals();
 		makeBuffers(m);
 	}

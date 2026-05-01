@@ -19,18 +19,18 @@ public:
   myVector3D();
 
   myVector3D(double dx, double dy, double dz);
-  double operator*(myVector3D & v1);
-  myVector3D operator+(myVector3D & v1);
+  double operator*(const myVector3D & v1) const;
+  myVector3D operator+(const myVector3D & v1) const;
   myVector3D operator+=(const myVector3D & v);
-  myVector3D operator-();
-  myVector3D operator-(myVector3D & v1);
-  myVector3D operator*(double s);
-  myVector3D operator/(double s);
-  void crossproduct(myVector3D &, myVector3D &);
-  myVector3D crossproduct(myVector3D &);
+  myVector3D operator-() const;
+  myVector3D operator-(const myVector3D & v1) const;
+  myVector3D operator*(double s) const;
+  myVector3D operator/(double s) const;
+  void crossproduct(const myVector3D &, const myVector3D &);
+  myVector3D crossproduct(const myVector3D &) const;
   void setNormal(myPoint3D *p1, myPoint3D *p2, myPoint3D *p3);
-  void rotate(myVector3D & lp, double theta);
-  double length( );
+  void rotate(const myVector3D & lp, double theta);
+  double length( ) const;
   void clear();
   void normalize( );
   void print(char *s);

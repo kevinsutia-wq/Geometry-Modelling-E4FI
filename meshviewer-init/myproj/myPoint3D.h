@@ -20,19 +20,19 @@ public:
 
   myPoint3D(double x, double y, double z);
   double dist(myPoint3D p1);
-  myPoint3D operator+(myVector3D & v1);
-  myPoint3D operator+(myPoint3D & v1);
-  myPoint3D & operator+=(myVector3D & v1);
-  myPoint3D & operator+=(myPoint3D & v1);
+  myPoint3D operator+(const myVector3D & v1) const;
+  myPoint3D operator+(const myPoint3D & v1) const;
+  myPoint3D & operator+=(const myVector3D & v1);
+  myPoint3D & operator+=(const myPoint3D & v1);
 
   myPoint3D & operator/=(double d);
   myPoint3D & operator*=(double d);
 
-  myPoint3D operator/(double d);
-  myPoint3D operator*(double d);
+  myPoint3D operator/(double d) const;
+  myPoint3D operator*(double d) const;
 
-  myVector3D operator-(myPoint3D & p1);
-  void rotate(myVector3D & lp, double theta);
+  myVector3D operator-(const myPoint3D & p1) const;
+  void rotate(const myVector3D & lp, double theta);
   void print(char *s);
   double dist(myPoint3D *p1, myPoint3D *p2);
   double dist(myPoint3D *p1, myPoint3D *p2, myPoint3D *p3);
