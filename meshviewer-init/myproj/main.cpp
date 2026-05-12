@@ -114,6 +114,34 @@ void menu(int item)
 			}
 			break;
 		}
+	case MENU_SELECTFACE:
+		{
+			if (pickedpoint == NULL) break;
+			closest_face = (*m->faces.begin());
+			double min = std::numeric_limits<double>::max();
+			for (vector<myFace *>::iterator it = m->faces.begin(); it != m->faces.end(); it++)
+			{
+				// calculer la distance du point au centre de la face
+				myPoint3D centre(0, 0, 0);
+				int count = 0;
+				myHalfedge *current = (*it)->adjacent_halfedge;
+				do {
+					centre.X += current->source->point->X;
+					centre.Y += current->source->point->Y;
+					centre.Z += current->source->point->Z;
+					count++;
+					current = current->next;
+				} while (current != (*it)->adjacent_halfedge);
+				
+				centre.X /= count;
+				centre.Y /= count;
+				centre.Z /= count;
+				
+				double d = pickedpoint->dist(centre);
+				if (d < min) { min = d; closest_face = *it; }
+			}
+			break;
+		}
 	case MENU_INFLATE:
 		{
 			for (vector<myVertex *>::iterator it = m->vertices.begin(); it != m->vertices.end(); it++)

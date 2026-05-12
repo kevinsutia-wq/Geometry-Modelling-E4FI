@@ -11,7 +11,13 @@ myHalfedge::myHalfedge(void)
 
 void myHalfedge::copy(myHalfedge *ie)
 {
-/**** TODO ****/
+	// copier tous les pointeurs et valeurs de ie
+	source = ie->source;
+	adjacent_face = ie->adjacent_face;
+	next = ie->next;
+	prev = ie->prev;
+	twin = ie->twin;
+	index = ie->index;
 }
 
 myHalfedge::~myHalfedge(void)

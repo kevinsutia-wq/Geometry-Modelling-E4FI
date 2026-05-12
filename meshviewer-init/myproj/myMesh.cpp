@@ -212,13 +212,130 @@ void myMesh::normalize()
 
 void myMesh::splitFaceTRIS(myFace *f, myPoint3D *p)
 {
-	/**** TODO ****/
+	// creer un nouveau vertex au centre de la face
+	myVertex *v = new myVertex();
+	v->point = p;
+	v->index = vertices.size();
+	v->originof = NULL;
+	vertices.push_back(v);
+
+	// stocker les edges originales
+	vector<myHalfedge*> originalEdges;
+	myHalfedge *courant = f->adjacent_halfedge;
+	do {
+		originalEdges.push_back(courant);
+		courant = courant->next;
+	} while (courant != f->adjacent_halfedge);
+
+	int nombreEdges = originalEdges.size();
+
+	// creer les triangles
+	for (int i = 0; i < nombreEdges; i++)
+	{
+		// creer trois halfedges pour le triangle
+		myHalfedge *he1 = new myHalfedge();
+		myHalfedge *he2 = new myHalfedge();
+		myHalfedge *he3 = new myHalfedge();
+
+		// creer la nouvelle face
+		myFace *newFace = new myFace();
+		newFace->adjacent_halfedge = he1;
+		newFace->index = faces.size();
+		faces.push_back(newFace);
+
+		// he1: edge externe (de la face originale)
+		he1->source = originalEdges[i]->source;
+		he1->adjacent_face = newFace;
+		he1->next = he2;
+		he1->prev = he3;
+		he1->twin = originalEdges[i]->twin;
+		he1->index = halfedges.size();
+		halfedges.push_back(he1);
+
+		// he2: vers le nouveau vertex
+		he2->source = originalEdges[i]->next->source;
+		he2->adjacent_face = newFace;
+		he2->next = he3;
+		he2->prev = he1;
+		he2->twin = NULL;
+		he2->index = halfedges.size();
+		halfedges.push_back(he2);
+
+		// he3: depuis le nouveau vertex
+		he3->source = v;
+		he3->adjacent_face = newFace;
+		he3->next = he1;
+		he3->prev = he2;
+		he3->twin = NULL;
+		he3->index = halfedges.size();
+		halfedges.push_back(he3);
+	}
+
+	// mettre a jour originof du nouveau vertex
+	v->originof = faces[faces.size() - 1]->adjacent_halfedge->next->next;
+
+	// supprimer l'ancienne face
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		if (faces[i] == f)
+		{
+			faces.erase(faces.begin() + i);
+			break;
+		}
+	}
 }
 
 void myMesh::splitEdge(myHalfedge *e1, myPoint3D *p)
 {
+	// creer un nouveau vertex au point p
+	myVertex *v = new myVertex();
+	v->point = p;
+	v->index = vertices.size();
+	v->originof = NULL;
+	vertices.push_back(v);
 
-	/**** TODO ****/
+	// creer deux nouveaux halfedges pour les deux parties de l'arete
+	myHalfedge *e2 = new myHalfedge();
+	myHalfedge *e3 = new myHalfedge();
+	myHalfedge *e4 = new myHalfedge();
+
+	// configurer e2 (deuxieme partie de e1)
+	e2->source = e1->next->source;
+	e2->adjacent_face = e1->adjacent_face;
+	e2->next = e1->next;
+	e2->prev = e1;
+	e2->twin = e4;
+	e2->index = halfedges.size();
+	halfedges.push_back(e2);
+
+	// configurer e3 (deuxieme partie de e1->twin)
+	e3->source = e1->twin->source;
+	e3->adjacent_face = e1->twin->adjacent_face;
+	e3->next = e1->twin->next;
+	e3->prev = e1->twin;
+	e3->twin = NULL;
+	e3->index = halfedges.size();
+	halfedges.push_back(e3);
+
+	// configurer e4 (twin de e2)
+	e4->source = v;
+	e4->adjacent_face = e1->twin->adjacent_face;
+	e4->next = e3;
+	e4->prev = e1->twin;
+	e4->twin = e2;
+	e4->index = halfedges.size();
+	halfedges.push_back(e4);
+
+	// mettre a jour e1
+	e1->next->prev = e2;
+	e1->next = e2;
+
+	// mettre a jour e1->twin
+	e1->twin->next = e4;
+	e1->twin->next->prev = e1->twin;
+
+	// configurer originof du nouveau vertex
+	v->originof = e4;
 }
 
 void myMesh::splitFaceQUADS(myFace *f, myPoint3D *p)
