@@ -20,7 +20,8 @@ enum MENU { MENU_CATMULLCLARK, MENU_DRAWWIREFRAME, MENU_EXIT, MENU_DRAWMESH, MEN
 	MENU_CONTRACTEDGE, MENU_CONTRACTFACE, MENU_DRAWCREASE, MENU_DRAWSILHOUETTE, 
 	MENU_GENERATE, MENU_CUT, MENU_INFLATE, MENU_SELECTEDGE, MENU_SELECTFACE, MENU_SELECTVERTEX,
 	MENU_SHADINGTYPE, MENU_SMOOTHEN, MENU_SPLITEDGE, MENU_SPLITFACE, MENU_SELECTCLEAR, 
-	MENU_TRIANGULATE, MENU_UNDO, MENU_WRITE, MENU_SIMPLIFY, MENU_DRAWNORMALS, MENU_OPENFILE
+	MENU_TRIANGULATE, MENU_UNDO, MENU_WRITE, MENU_SIMPLIFY, MENU_DRAWNORMALS, MENU_OPENFILE,
+	MENU_REVOLUTION
 };
  
 myMesh *m;
@@ -185,6 +186,16 @@ void menu(int item)
 			makeBuffers(m);
 			break;
 	    }
+	case MENU_REVOLUTION:
+		{
+			// surface de revolution: 8 etapes, 360 degres
+			m->surfaceOfRevolution(8, 6.28f);
+			clear();
+			// ne pas appeler computeNormals car les halfedges ne sont pas complets
+			// makeBuffers va utiliser les normals assignés dans surfaceOfRevolution
+			makeBuffers(m);
+			break;
+		}
 	case MENU_EXIT:
 		{
 			m->clear();
@@ -422,7 +433,7 @@ void initMesh()
 
 	m = new myMesh();
 	// Choisis le modèle : hand.obj, apple.obj ou cube.obj
-	if (m->readFile("apple.obj")) {
+	if (m->readFile("cube.obj")) {
 		m->computeNormals();
 		makeBuffers(m);
 	}

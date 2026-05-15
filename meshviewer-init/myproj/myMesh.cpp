@@ -4,6 +4,7 @@
 #include <sstream>
 #include <map>
 #include <utility>
+#include <cmath>
 #include <GL/glew.h>
 #include "myVector3D.h"
 
@@ -410,5 +411,158 @@ bool myMesh::triangulate(myFace* f)
 	this->splitFaceTRIS(f, centre);
 
 	return true;
+}
+
+void myMesh::surfaceOfRevolution(int steps, float angleMax)
+{
+	// alloc normals pour les vertices existants
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		if (vertices[i]->normal == NULL)
+			vertices[i]->normal = new myVector3D(0, 0, 0);
+	}
+
+	// stocker les vertices du profil original
+	int profil_size = vertices.size();
+	vector<myVertex*> originalVertices;
+	for (int i = 0; i < profil_size; i++)
+		originalVertices.push_back(vertices[i]);
+
+	// dupliquer les vertices pour chaque etape de rotation
+	for (int step = 1; step < steps; step++)
+	{
+		float angle = (angleMax / steps) * step;
+		float cosA = cos(angle);
+		float sinA = sin(angle);
+
+		for (int i = 0; i < profil_size; i++)
+		{
+			float x = originalVertices[i]->point->X;
+			float y = originalVertices[i]->point->Y;
+			float z = originalVertices[i]->point->Z;
+
+			float newX = x * cosA - z * sinA;
+			float newZ = x * sinA + z * cosA;
+
+			myVertex *v = new myVertex();
+			v->point = new myPoint3D(newX, y, newZ);
+			v->index = vertices.size();
+			v->originof = NULL;
+			v->normal = new myVector3D(0, 0, 0);
+			vertices.push_back(v);
+		}
+	}
+
+	// creer les faces avec halfedges
+	for (int step = 0; step < steps - 1; step++)
+	{
+		for (int i = 0; i < profil_size - 1; i++)
+		{
+			int idx0 = step * profil_size + i;
+			int idx1 = step * profil_size + i + 1;
+			int idx2 = (step + 1) * profil_size + i;
+			int idx3 = (step + 1) * profil_size + i + 1;
+
+			// triangle 1: idx0, idx1, idx3
+			myHalfedge *he1a = new myHalfedge();
+			myHalfedge *he1b = new myHalfedge();
+			myHalfedge *he1c = new myHalfedge();
+
+			myFace *f1 = new myFace();
+			f1->normal = new myVector3D(0, 0, 0);
+			
+			// calculer la normale du triangle
+			myPoint3D* pA = vertices[idx0]->point;
+			myPoint3D* pB = vertices[idx1]->point;
+			myPoint3D* pC = vertices[idx3]->point;
+			myVector3D v1(pB->X - pA->X, pB->Y - pA->Y, pB->Z - pA->Z);
+			myVector3D v2(pC->X - pA->X, pC->Y - pA->Y, pC->Z - pA->Z);
+			myVector3D normal = v1.crossproduct(v2);
+			normal.normalize();
+			f1->normal->dX = normal.dX;
+			f1->normal->dY = normal.dY;
+			f1->normal->dZ = normal.dZ;
+			
+			f1->index = faces.size();
+			f1->adjacent_halfedge = he1a;
+			faces.push_back(f1);
+
+			he1a->source = vertices[idx0];
+			he1a->adjacent_face = f1;
+			he1a->next = he1b;
+			he1a->prev = he1c;
+			he1a->twin = NULL;
+			he1a->index = halfedges.size();
+			halfedges.push_back(he1a);
+
+			he1b->source = vertices[idx1];
+			he1b->adjacent_face = f1;
+			he1b->next = he1c;
+			he1b->prev = he1a;
+			he1b->twin = NULL;
+			he1b->index = halfedges.size();
+			halfedges.push_back(he1b);
+
+			he1c->source = vertices[idx3];
+			he1c->adjacent_face = f1;
+			he1c->next = he1a;
+			he1c->prev = he1b;
+			he1c->twin = NULL;
+			he1c->index = halfedges.size();
+			halfedges.push_back(he1c);
+
+			// triangle 2: idx0, idx3, idx2
+			myHalfedge *he2a = new myHalfedge();
+			myHalfedge *he2b = new myHalfedge();
+			myHalfedge *he2c = new myHalfedge();
+
+			myFace *f2 = new myFace();
+			f2->normal = new myVector3D(0, 0, 0);
+			
+			// calculer la normale du deuxième triangle
+			pA = vertices[idx0]->point;
+			pB = vertices[idx3]->point;
+			pC = vertices[idx2]->point;
+			v1 = myVector3D(pB->X - pA->X, pB->Y - pA->Y, pB->Z - pA->Z);
+			v2 = myVector3D(pC->X - pA->X, pC->Y - pA->Y, pC->Z - pA->Z);
+			normal = v1.crossproduct(v2);
+			normal.normalize();
+			f2->normal->dX = normal.dX;
+			f2->normal->dY = normal.dY;
+			f2->normal->dZ = normal.dZ;
+			
+			f2->index = faces.size();
+			f2->adjacent_halfedge = he2a;
+			faces.push_back(f2);
+
+			he2a->source = vertices[idx0];
+			he2a->adjacent_face = f2;
+			he2a->next = he2b;
+			he2a->prev = he2c;
+			he2a->twin = NULL;
+			he2a->index = halfedges.size();
+			halfedges.push_back(he2a);
+
+			he2b->source = vertices[idx3];
+			he2b->adjacent_face = f2;
+			he2b->next = he2c;
+			he2b->prev = he2a;
+			he2b->twin = NULL;
+			he2b->index = halfedges.size();
+			halfedges.push_back(he2b);
+
+			he2c->source = vertices[idx2];
+			he2c->adjacent_face = f2;
+			he2c->next = he2a;
+			he2c->prev = he2b;
+			he2c->twin = NULL;
+			he2c->index = halfedges.size();
+			halfedges.push_back(he2c);
+		}
+	}
+
+	cout << "Surface of revolution created!" << endl;
+	cout << "Vertices: " << vertices.size() << endl;
+	cout << "Faces: " << faces.size() << endl;
 }
 
